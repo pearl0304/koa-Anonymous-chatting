@@ -4,17 +4,30 @@
     const inpuEl = document.getElementById('input')
     const messageEl = document.getElementById('message')
 
-
     if(!formEl || !inpuEl || !messageEl) throw new Error ('Init failed')
     
     const messages = []
-    
+
+    // Naming Random Nick Name
+    const adjectives = ['늠름한', '친절한', '새침한', '멋진', '훌륭한', '귀여운']
+    const animal = ['도베르만', '참새', '토끼', '강아지', '흑표범'] 
+
+    function pickRandomNickname (array){
+        const randomIndx = Math.floor(Math.random()*(array.length))
+        const result = array[randomIndx]
+
+        if(!result) throw new Error ('random nick name array is empty')
+        return result
+    }
+
+    const userNickName = `${pickRandomNickname(adjectives)} ${pickRandomNickname(animal)}`
+
     formEl.addEventListener('submit',e=>{
         e.preventDefault() // Prevent send the form
         socket.send(
             JSON.stringify(
                 {
-                    nickname : "늠름한 도베르만",
+                    nickname : userNickName,
                     message : inpuEl.value
                 }
             )
