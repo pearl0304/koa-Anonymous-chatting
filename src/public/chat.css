@@ -38,6 +38,6 @@ body{
     color: #fff; 
 }
 #message{list-style-type: none; margin: 0; padding: 0; }
-#message > li {padding: 0.5rem 1rem; }
-#messages > li:nth-child(odd) { background: #efefef; }
+#message>li {padding: 0.5rem 1rem;}
+#messages>li:nth-child(odd) { background: #efefef; }
 
