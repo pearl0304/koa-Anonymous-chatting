@@ -5,21 +5,53 @@ import route from "koa-route";
 const app = websockify(new App().app);
 const PORT = 5002;
 
+const _client = await new App().db
+
+async function getMessagesCollection(){
+    const client = await _client
+    return client.db('chat').collection('messages')
+}
+
+
 // WebSocket
-app.ws.use(route.all('/ws',ctx=>{
+app.ws.use(route.all('/ws',async (ctx)=>{
+
+    // Render exited messages when user join the chatting room
+    console.log('passed Render exited messages')
+    const messagescollection = await getMessagesCollection()
+    const chatCursor = await messagescollection.find({},{})
+    
+    const chats = chatCursor.toArray()
+    ctx.websocket.send(JSON.stringify(
+            {
+                type : 'sync',
+                payload : {chats}
+            }
+        )
+    )
+
 
     //[Recive Message]
-    ctx.websocket.on('message',(data)=> {
+    ctx.websocket.on('message',async (data)=> {
         if(typeof data != 'string') return
 
-        const {nickname, message} = JSON.parse(data) 
-        const {server} = app.ws
-        if(!server) return
-        
-        server.clients.forEach(client=>{
-            client.send(JSON.stringify({nickname,message}))
+        const chats= JSON.parse(data) 
+        await messagescollection.insertOne({
+            ...chats,
+            createdAt : new Date()
         })
 
+        const {nickname, message} = chats
+
+        const {server} = app.ws
+        if(!server) return
+           
+        server.clients.forEach(client=>{
+            client.send(JSON.stringify({
+                type : 'chat',
+                payload : {nickname,message}
+            }))
+        })
       });
 }));
 

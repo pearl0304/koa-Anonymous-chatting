@@ -22,7 +22,7 @@ class App {
         this.getRouter()
     }
 
-    async setDatabase(){await this.db}
+    setDatabase(){this.db}
 
     setViewEngin(){
         const __dirname = path.resolve()
