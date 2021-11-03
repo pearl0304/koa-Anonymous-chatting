@@ -13,6 +13,7 @@ import router from "./routers/main.js"
 class App {
     constructor(){
         this.app = new Koa()
+        this.db = mongoClient.connect() 
 
         this.setDatabase()
         this.setViewEngin()
@@ -21,11 +22,7 @@ class App {
         this.getRouter()
     }
 
-    async setDatabase(){
-        const _client = mongoClient.connect() 
-        const client = await _client
-        return client.db('chat').collection('messages')
-    }
+    async setDatabase(){await this.db}
 
     setViewEngin(){
         const __dirname = path.resolve()
