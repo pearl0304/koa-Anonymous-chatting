@@ -2,9 +2,9 @@
     const socket = new WebSocket(`ws://${window.location.host}/ws`)
     const formEl = document.getElementById('form')
     const inpuEl = document.getElementById('input')
-    const messageEl = document.getElementById('message')
+    const chatsEl = document.getElementById('message')
 
-    if(!formEl || !inpuEl || !messageEl) throw new Error ('Init failed')
+    if(!formEl || !inpuEl || !chatsEl) throw new Error ('Init failed')
     
     const messages = []
 
@@ -35,17 +35,29 @@
         inpuEl.value=''
     })
 
-    socket.addEventListener('message',(e)=>{
-        messages.push(JSON.parse(e.data))
-
-        messageEl.innerHTML=''
-       
+    const drawChats = () =>{
+        chatsEl.innerHTML=''
         messages.forEach(({message,nickname})=>{
             const li = document.createElement('li')
             li.textContent = `${nickname} : ${message}`
-            messageEl.appendChild(li)
+            chatsEl.appendChild(li)
             window.scrollTo(0, document.body.scrollHeight)
         })
+    }
+
+    socket.addEventListener('message',(e)=>{
+        const {type, payload} = JSON.parse(e.data)
+  
+        if(type === 'sync'){
+            const {chats: syncedChats} = payload
+            messages.push(...syncedChats)
+        }else if(type === 'chat'){
+            const chat = payload
+            messages.push(chat)
+        }
+
+        drawChats()
+        
     })
 
 })()

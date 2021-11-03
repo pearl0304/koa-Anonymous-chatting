@@ -9,7 +9,7 @@ const _client = await new App().db
 
 async function getMessagesCollection(){
     const client = await _client
-    return client.db('chat').collection('messages')
+    return client.db('test').collection('messages')
 }
 
 
@@ -19,9 +19,9 @@ app.ws.use(route.all('/ws',async (ctx)=>{
     // Render exited messages when user join the chatting room
     console.log('passed Render exited messages')
     const messagescollection = await getMessagesCollection()
-    const chatCursor = await messagescollection.find({},{})
+    const chatCursor = await messagescollection.find({},{sort:{createdAt:1}})
     
-    const chats = chatCursor.toArray()
+    const chats = await chatCursor.toArray()
     ctx.websocket.send(JSON.stringify(
             {
                 type : 'sync',
@@ -29,7 +29,6 @@ app.ws.use(route.all('/ws',async (ctx)=>{
             }
         )
     )
-
 
     //[Recive Message]
     ctx.websocket.on('message',async (data)=> {
