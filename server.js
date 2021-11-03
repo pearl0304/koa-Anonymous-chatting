@@ -8,14 +8,11 @@ const PORT = 5002;
 // WebSocket
 app.ws.use(route.all('/ws',ctx=>{
 
-    ctx.websocket.send('Client Connection')
-
     //[Recive Message]
     ctx.websocket.on('message',(data)=> {
         if(typeof data != 'string') return
 
         const {nickname, message} = JSON.parse(data) 
-
         const {server} = app.ws
         if(!server) return
         
